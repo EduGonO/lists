@@ -15,7 +15,10 @@
         "@tailwindcss/aspect-ratio": "0.4.2",
         "@tailwindcss/forms": "0.5.3",
         "@tailwindcss/typography": "0.5.7",
+        "@types/codemirror": "^5.60.8",
         "@types/gulp": "^4.0.7",
+        "@types/react": "18.3.3",
+        "@types/react-dom": "18.3.0",
         "autoprefixer": "^10.4.13",
         "cross-env": "^7.0.3",
         "cssnano": "^5.1.13",
@@ -105,7 +108,10 @@
         "tldraw:build": "yarn --cwd packages/tldraw install",
         "amplify:build": "yarn --cwd packages/amplify install",
         "ui:build": "yarn --cwd packages/ui install",
-        "postinstall": "yarn tldraw:build && yarn amplify:build && yarn ui:build"
+        "postinstall": "yarn tldraw:build && yarn amplify:build && yarn ui:build",
+        "vercel:dev": "next dev vercel-app",
+        "vercel:build": "next build vercel-app",
+        "vercel:start": "next start vercel-app"
     },
     "dependencies": {
         "@capacitor-community/safe-area": "7.0.0-alpha.1",
@@ -171,6 +177,7 @@
         "katex": "^0.16.10",
         "marked": "^5.1.2",
         "mldoc": "^1.5.9",
+        "next": "14.2.5",
         "path": "0.12.7",
         "path-complete-extname": "1.0.0",
         "pdfjs-dist": "4.2.67",

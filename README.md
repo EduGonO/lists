@@ -102,6 +102,13 @@ To start using Logseq, follow these simple steps:
 2. Install Logseq on your device and launch the application
 3. Start writing ✍️
 
+> **Just want to try the editor?** Deploy this repository to Vercel (or view the
+> hosted preview) and the root route serves a dedicated Next.js sandbox located
+> under [`vercel-app/`](vercel-app/). It bundles a lean CodeMirror instance with
+> Tailwind styling so you can explore the editor instantly without building the
+> full desktop application. You can also preview it locally with
+> `yarn vercel:dev`.
+
 That's it! You can now enjoy the benefits of using Logseq to streamline your workflow, manage your projects, and stay on top of your goals. Have fun! 🎉
 
 **Linux users**: Use the automated installer script for the best experience:
