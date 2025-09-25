@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Logseq Text Editor Preview</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.css"
+      integrity="sha256-xuq2ut9WVuVFpw5mD6lSQ4dG6FfhI61FQQcO/lKBhMY="
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        color-scheme: dark light;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(circle at top, #0f172a, #020617 55%);
+        color: #e2e8f0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(1rem, 2vw, 2.5rem);
+      }
+
+      main {
+        max-width: min(960px, 100%);
+        width: 100%;
+        background: rgba(15, 23, 42, 0.85);
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 35px 65px rgba(8, 15, 45, 0.35);
+        backdrop-filter: blur(18px);
+        overflow: hidden;
+      }
+
+      header {
+        padding: clamp(1.5rem, 3vw, 2.75rem);
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: clamp(1.5rem, 4vw, 2.6rem);
+        letter-spacing: -0.04em;
+      }
+
+      header p {
+        margin: 0;
+        color: rgba(226, 232, 240, 0.75);
+        font-size: clamp(0.95rem, 2vw, 1.05rem);
+        line-height: 1.6;
+      }
+
+      header button {
+        justify-self: start;
+        border: none;
+        border-radius: 999px;
+        padding: 0.6rem 1.3rem;
+        font-weight: 600;
+        background: linear-gradient(120deg, #38bdf8, #a855f7 65%, #f97316 100%);
+        color: #0f172a;
+        cursor: pointer;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        box-shadow: 0 12px 24px rgba(56, 189, 248, 0.25);
+      }
+
+      header button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 28px rgba(56, 189, 248, 0.32);
+      }
+
+      #editor-container {
+        position: relative;
+      }
+
+      .CodeMirror {
+        height: clamp(420px, 60vh, 540px);
+        font-size: 1rem;
+        line-height: 1.5;
+        padding: 1.25rem 1.5rem;
+        background: rgba(15, 23, 42, 0.95);
+      }
+
+      footer {
+        border-top: 1px solid rgba(148, 163, 184, 0.2);
+        padding: 0.85rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+        color: rgba(226, 232, 240, 0.6);
+      }
+
+      footer a {
+        color: inherit;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @media (max-width: 720px) {
+        body {
+          padding: 1rem;
+        }
+
+        header button {
+          width: 100%;
+          justify-self: stretch;
+          text-align: center;
+        }
+
+        footer {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Logseq Editor Sandbox</h1>
+        <p>
+          Explore the Logseq CodeMirror-based editor without launching the full
+          desktop application. Start typing to experience block editing,
+          markdown shortcuts, and live preview in a focused environment.
+        </p>
+        <button type="button" id="reset-example">Reset example note</button>
+      </header>
+      <div id="editor-container">
+        <label class="sr-only" for="editor">Editor</label>
+        <textarea id="editor" autocomplete="off" autocorrect="off" spellcheck="false">
+- # Daily Journal
+- **Tasks**
+  - [ ] Migrate my notes into Logseq
+  - [ ] Publish this page to Vercel
+- **Ideas**
+  - Embed a graph view of backlinks
+  - Add flashcards for spaced repetition
+
+> Tip: Use markdown shortcuts. Type <code>/</code> to insert blocks, or <code>[[</code> to link to pages.
+        </textarea>
+      </div>
+      <footer>
+        <span id="cursor-position">Line 1, Column 1</span>
+        <span id="character-count">0 characters</span>
+      </footer>
+    </main>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.js"
+      integrity="sha256-v2SDF79B3cWwvhroXM/vMpqiT0W+GtMMugnBj7EU+pc="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/mode/markdown/markdown.min.js"
+      integrity="sha256-0GiayhjRx9unQr4+BGEFVk7nD8TVYsagwFAvXaeYVjc="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/addon/edit/closebrackets.min.js"
+      integrity="sha256-QEYHS0NPziUXYIdCWA17h+pX+v6+wr5z436JoABXfyQ="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/addon/edit/matchbrackets.min.js"
+      integrity="sha256-1MpVZMNcY4M0ExVq4QcO9/ImVfJCiAX9IEOKdTzrbac="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/addon/selection/active-line.min.js"
+      integrity="sha256-kZLykKXZ7aivypjG8JJ4qlS9Bs42FPBxOeXaP3gcTp0="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const defaultContent = document.getElementById("editor").value.trim();
+
+      const editor = window.CodeMirror.fromTextArea(
+        document.getElementById("editor"),
+        {
+          mode: "markdown",
+          theme: "default",
+          lineNumbers: true,
+          styleActiveLine: true,
+          autoCloseBrackets: true,
+          viewportMargin: Infinity,
+        }
+      );
+
+      const cursorDisplay = document.getElementById("cursor-position");
+      const characterDisplay = document.getElementById("character-count");
+
+      function updateCursor() {
+        const { line, ch } = editor.getCursor();
+        cursorDisplay.textContent = `Line ${line + 1}, Column ${ch + 1}`;
+      }
+
+      function updateCharacterCount() {
+        const count = editor.getValue().trim().length;
+        characterDisplay.textContent = `${count.toLocaleString()} character${
+          count === 1 ? "" : "s"
+        }`;
+      }
+
+      function resetContent() {
+        editor.setValue(defaultContent + "\n");
+        editor.setCursor({ line: 0, ch: 0 });
+        editor.focus();
+      }
+
+      editor.on("cursorActivity", updateCursor);
+      editor.on("change", updateCharacterCount);
+
+      document
+        .getElementById("reset-example")
+        .addEventListener("click", () => {
+          resetContent();
+        });
+
+      resetContent();
+      updateCursor();
+      updateCharacterCount();
+    </script>
+  </body>
+</html>

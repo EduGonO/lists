@@ -102,6 +102,12 @@ To start using Logseq, follow these simple steps:
 2. Install Logseq on your device and launch the application
 3. Start writing ✍️
 
+> **Just want to try the editor?** Deploy this repository to Vercel (or view the
+> hosted preview) and the root route will serve the lightweight
+> [`public/editor/index.html`](public/editor/index.html) sandbox. It ships a
+> standalone CodeMirror instance so you can explore the core editing experience
+> without building the full desktop app.
+
 That's it! You can now enjoy the benefits of using Logseq to streamline your workflow, manage your projects, and stay on top of your goals. Have fun! 🎉
 
 **Linux users**: Use the automated installer script for the best experience:
