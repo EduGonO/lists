@@ -3,149 +3,463 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Logseq Text Editor Preview</title>
+    <title>Creative Editors Studio</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&family=SF+Pro+Text:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.css"
       integrity="sha256-xuq2ut9WVuVFpw5mD6lSQ4dG6FfhI61FQQcO/lKBhMY="
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css"
+      integrity="sha256-x8W9mOLYWx+P2S5eH3sdcVRobsWzsTnZX5ARo+f8axk="
+      crossorigin="anonymous"
+    />
     <style>
       :root {
         color-scheme: dark light;
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --bg-primary: #040510;
+        --bg-elevated: rgba(17, 20, 40, 0.85);
+        --bg-card: rgba(15, 18, 36, 0.9);
+        --bg-card-strong: rgba(18, 20, 34, 0.95);
+        --border-glass: rgba(148, 163, 184, 0.22);
+        --border-muted: rgba(94, 106, 133, 0.35);
+        --text-primary: #f8fafc;
+        --text-secondary: rgba(226, 232, 240, 0.72);
+        --accent-blue: #60a5fa;
+        --accent-purple: #a855f7;
+        --accent-orange: #fb923c;
+        --accent-green: #34d399;
+        --shadow-soft: 0 40px 90px rgba(8, 12, 32, 0.45);
+        font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background-color: var(--bg-primary);
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         margin: 0;
-        background: radial-gradient(circle at top, #0f172a, #020617 55%);
-        color: #e2e8f0;
         min-height: 100vh;
+        background:
+          radial-gradient(circle at 15% 20%, rgba(96, 165, 250, 0.25), transparent 55%),
+          radial-gradient(circle at 80% 10%, rgba(168, 85, 247, 0.3), transparent 60%),
+          radial-gradient(circle at 50% 85%, rgba(251, 146, 60, 0.15), transparent 65%),
+          #030712;
+        color: var(--text-primary);
         display: flex;
-        align-items: center;
         justify-content: center;
-        padding: clamp(1rem, 2vw, 2.5rem);
+        padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 3rem) clamp(4rem, 8vw, 6rem);
       }
 
-      main {
-        max-width: min(960px, 100%);
-        width: 100%;
-        background: rgba(15, 23, 42, 0.85);
-        border-radius: 18px;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        box-shadow: 0 35px 65px rgba(8, 15, 45, 0.35);
-        backdrop-filter: blur(18px);
+      main.page-shell {
+        width: min(1200px, 100%);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(2.5rem, 4vw, 4rem);
+      }
+
+      .hero {
+        position: relative;
         overflow: hidden;
+        border-radius: 28px;
+        padding: clamp(2.5rem, 5vw, 4rem);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(17, 24, 39, 0.85));
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: var(--shadow-soft);
+        isolation: isolate;
       }
 
-      header {
-        padding: clamp(1.5rem, 3vw, 2.75rem);
+      .hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 20% 0%, rgba(96, 165, 250, 0.35), transparent 55%),
+          radial-gradient(circle at 60% 0%, rgba(168, 85, 247, 0.25), transparent 60%),
+          radial-gradient(circle at 100% 40%, rgba(248, 113, 113, 0.35), transparent 60%);
+        opacity: 0.55;
+        z-index: -1;
+        filter: blur(35px);
+      }
+
+      .hero > div {
         display: grid;
-        gap: 0.75rem;
-      }
-
-      header h1 {
-        margin: 0;
-        font-size: clamp(1.5rem, 4vw, 2.6rem);
-        letter-spacing: -0.04em;
-      }
-
-      header p {
-        margin: 0;
-        color: rgba(226, 232, 240, 0.75);
-        font-size: clamp(0.95rem, 2vw, 1.05rem);
-        line-height: 1.6;
-      }
-
-      header button {
-        justify-self: start;
-        border: none;
-        border-radius: 999px;
-        padding: 0.6rem 1.3rem;
-        font-weight: 600;
-        background: linear-gradient(120deg, #38bdf8, #a855f7 65%, #f97316 100%);
-        color: #0f172a;
-        cursor: pointer;
-        transition: transform 120ms ease, box-shadow 120ms ease;
-        box-shadow: 0 12px 24px rgba(56, 189, 248, 0.25);
-      }
-
-      header button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 16px 28px rgba(56, 189, 248, 0.32);
-      }
-
-      #editor-container {
+        gap: 1.6rem;
         position: relative;
       }
 
-      .CodeMirror {
-        height: clamp(420px, 60vh, 540px);
-        font-size: 1rem;
-        line-height: 1.5;
-        padding: 1.25rem 1.5rem;
-        background: rgba(15, 23, 42, 0.95);
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.2);
+        color: var(--text-secondary);
+        letter-spacing: 0.18em;
+        font-size: 0.74rem;
+        text-transform: uppercase;
       }
 
-      footer {
-        border-top: 1px solid rgba(148, 163, 184, 0.2);
-        padding: 0.85rem 1.5rem;
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(2.4rem, 6vw, 3.6rem);
+        letter-spacing: -0.045em;
+        font-weight: 600;
+        line-height: 1.1;
+      }
+
+      .hero p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: clamp(1rem, 2vw, 1.15rem);
+        line-height: 1.7;
+        max-width: 54ch;
+      }
+
+      .hero-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .hero-button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.85rem 1.8rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        cursor: pointer;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+      }
+
+      .hero-button.primary {
+        background: linear-gradient(120deg, var(--accent-blue), var(--accent-purple) 60%, var(--accent-orange));
+        color: #020617;
+        box-shadow: 0 22px 45px rgba(96, 165, 250, 0.35);
+      }
+
+      .hero-button.secondary {
+        background: rgba(148, 163, 184, 0.18);
+        color: var(--text-primary);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .hero-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 28px 48px rgba(96, 165, 250, 0.35);
+      }
+
+      .editor-grid {
+        display: grid;
+        gap: clamp(1.8rem, 3vw, 2.6rem);
+      }
+
+      @media (min-width: 1080px) {
+        .editor-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      .editor-card {
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-card);
+        border-radius: 24px;
+        border: 1px solid var(--border-glass);
+        box-shadow: 0 18px 40px rgba(5, 8, 20, 0.45);
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+        min-height: 460px;
+      }
+
+      .editor-card:nth-child(2) {
+        background: var(--bg-card-strong);
+      }
+
+      .editor-card header {
+        padding: 1.8rem 1.9rem 1.4rem;
+        display: grid;
+        gap: 0.6rem;
+      }
+
+      .editor-card h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .editor-card p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.55;
+      }
+
+      .editor-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(226, 232, 240, 0.7);
+        background: rgba(100, 116, 139, 0.16);
+      }
+
+      .editor-surface {
+        flex: 1;
+        padding: 0 1.9rem 1.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .editor-surface-inner {
+        flex: 1;
+        position: relative;
+        border-radius: 18px;
+        border: 1px solid var(--border-muted);
+        background: rgba(9, 11, 24, 0.8);
+        overflow: hidden;
+      }
+
+      .editor-actions {
         display: flex;
         justify-content: space-between;
-        gap: 1rem;
+        align-items: center;
         font-size: 0.85rem;
-        letter-spacing: 0.05em;
         color: rgba(226, 232, 240, 0.6);
       }
 
-      footer a {
-        color: inherit;
+      .editor-actions button {
+        border: none;
+        background: rgba(148, 163, 184, 0.18);
+        color: var(--text-primary);
+        border-radius: 999px;
+        padding: 0.45rem 1.2rem;
+        cursor: pointer;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        transition: background 120ms ease, transform 120ms ease;
       }
 
-      .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
+      .editor-actions button:hover {
+        background: rgba(148, 163, 184, 0.28);
+        transform: translateY(-1px);
+      }
+
+      .CodeMirror {
+        height: 100%;
+        font-size: 0.98rem;
+        line-height: 1.58;
+        padding: 1.25rem 1.4rem;
+        background: transparent;
+        color: var(--text-primary);
+      }
+
+      .CodeMirror-gutters {
+        background: rgba(15, 23, 42, 0.6);
+        border-right: none;
+        color: rgba(148, 163, 184, 0.5);
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        padding: 0.9rem 1rem;
+        background: rgba(148, 163, 184, 0.08);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      }
+
+      .toolbar button {
+        border: none;
+        background: rgba(148, 163, 184, 0.12);
+        color: var(--text-primary);
+        padding: 0.45rem 0.9rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        letter-spacing: -0.01em;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+      }
+
+      .toolbar button.is-active {
+        background: linear-gradient(120deg, rgba(96, 165, 250, 0.22), rgba(168, 85, 247, 0.25));
+        color: var(--accent-blue);
+      }
+
+      .toolbar button:hover {
+        background: rgba(148, 163, 184, 0.22);
+        transform: translateY(-1px);
+      }
+
+      .tiptap-shell,
+      .novel-shell {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .tiptap-editor,
+      .novel-editor {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.4rem 1.6rem;
+        color: var(--text-primary);
+        line-height: 1.7;
+        font-size: 1rem;
+      }
+
+      .tiptap-editor {
+        background: rgba(11, 14, 30, 0.85);
+      }
+
+      .novel-editor {
+        background: rgba(7, 10, 24, 0.82);
+      }
+
+      .tiptap-editor p,
+      .novel-editor p {
+        margin: 0 0 1rem;
+      }
+
+      .tiptap-editor h2,
+      .novel-editor h2,
+      .novel-editor h3 {
+        font-weight: 600;
+        margin: 1.2rem 0 0.8rem;
+      }
+
+      .editor-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.82rem;
+        color: rgba(226, 232, 240, 0.6);
+      }
+
+      .status-dot {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .status-dot::before {
+        content: '';
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--accent-green);
+        box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.18);
+      }
+
+      .site-footer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        color: rgba(226, 232, 240, 0.55);
+        font-size: 0.85rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.12);
+        padding-top: 1.4rem;
+      }
+
+      .site-footer a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      textarea#logseq-source {
+        display: none;
+      }
+
+      @media (max-width: 960px) {
+        .editor-card {
+          min-height: 420px;
+        }
       }
 
       @media (max-width: 720px) {
         body {
-          padding: 1rem;
+          padding: 1.5rem 1.1rem 3rem;
         }
 
-        header button {
-          width: 100%;
-          justify-self: stretch;
-          text-align: center;
+        .hero {
+          border-radius: 22px;
         }
 
-        footer {
+        .hero-buttons {
           flex-direction: column;
-          align-items: flex-start;
+        }
+
+        .editor-card header {
+          padding: 1.5rem 1.5rem 1.25rem;
+        }
+
+        .editor-surface {
+          padding: 0 1.5rem 1.4rem;
         }
       }
     </style>
   </head>
   <body>
-    <main>
-      <header>
-        <h1>Logseq Editor Sandbox</h1>
-        <p>
-          Explore the Logseq CodeMirror-based editor without launching the full
-          desktop application. Start typing to experience block editing,
-          markdown shortcuts, and live preview in a focused environment.
-        </p>
-        <button type="button" id="reset-example">Reset example note</button>
+    <main class="page-shell">
+      <header class="hero">
+        <div>
+          <span class="hero-eyebrow">Crafted for focus</span>
+          <h1>Three editors, one immersive workspace.</h1>
+          <p>
+            Compare the Logseq block editor, a fluid TipTap playground, and the Novel canvas—each carefully
+            tuned for rapid ideation. Switch contexts instantly, capture ideas elegantly, and feel how the
+            right tools elevate every note.
+          </p>
+          <div class="hero-buttons">
+            <button class="hero-button primary" type="button">Start writing</button>
+            <button class="hero-button secondary" type="button">Learn about the stack</button>
+          </div>
+        </div>
       </header>
-      <div id="editor-container">
-        <label class="sr-only" for="editor">Editor</label>
-        <textarea id="editor" autocomplete="off" autocorrect="off" spellcheck="false">
+
+      <section class="editor-grid">
+        <article class="editor-card">
+          <header>
+            <span class="editor-badge">Logseq Blocks</span>
+            <h2>Structured outlining with instant feedback.</h2>
+            <p>
+              Explore the familiar Logseq block editor experience in a focused sandbox. It supports Markdown
+              shortcuts, live preview, and smart cursor indicators.
+            </p>
+          </header>
+          <div class="editor-surface">
+            <div class="editor-surface-inner" id="logseq-surface">
+              <textarea id="logseq-source" autocomplete="off" autocorrect="off" spellcheck="false">
 - # Daily Journal
 - **Tasks**
   - [ ] Migrate my notes into Logseq
@@ -155,11 +469,62 @@
   - Add flashcards for spaced repetition
 
 > Tip: Use markdown shortcuts. Type <code>/</code> to insert blocks, or <code>[[</code> to link to pages.
-        </textarea>
-      </div>
-      <footer>
-        <span id="cursor-position">Line 1, Column 1</span>
-        <span id="character-count">0 characters</span>
+              </textarea>
+            </div>
+            <div class="editor-actions">
+              <span id="logseq-position">Line 1, Column 1</span>
+              <div>
+                <span id="logseq-count">0 characters</span>
+                <button id="logseq-reset" type="button">Reset example</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="editor-card">
+          <header>
+            <span class="editor-badge">TipTap Canvas</span>
+            <h2>Mobile-friendly rich text that keeps pace.</h2>
+            <p>
+              Experiment with TipTap’s headless editor and responsive formatting controls. Try touch-friendly
+              selection, inline styling, lists, and live statistics.
+            </p>
+          </header>
+          <div class="editor-surface">
+            <div class="editor-surface-inner">
+              <div id="tiptap-root" class="tiptap-shell" aria-live="polite"></div>
+            </div>
+            <div class="editor-meta" id="tiptap-meta">Preparing editor…</div>
+          </div>
+        </article>
+
+        <article class="editor-card">
+          <header>
+            <span class="editor-badge">Novel Studio</span>
+            <h2>Notion-style flow with advanced slash commands.</h2>
+            <p>
+              Harness the Novel editor powered by TipTap. Drag to reorganize content, toggle between headings,
+              tasks, quotes, and manage typography with a minimal toolbar.
+            </p>
+          </header>
+          <div class="editor-surface">
+            <div class="editor-surface-inner">
+              <div id="novel-root" class="novel-shell" aria-live="polite"></div>
+            </div>
+            <div class="editor-meta">
+              <span class="status-dot" id="novel-status">Synced</span>
+              <span id="novel-stats">0 words</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <footer class="site-footer">
+        <span>Designed to feel at home on every device.</span>
+        <span>
+          Built with ❤️ using Logseq, TipTap, and Novel.
+          <a href="https://github.com/logseq/logseq" target="_blank" rel="noreferrer">Explore the source</a>.
+        </span>
       </footer>
     </main>
 
@@ -189,53 +554,427 @@
       crossorigin="anonymous"
     ></script>
     <script>
-      const defaultContent = document.getElementById("editor").value.trim();
+      (function () {
+        const textarea = document.getElementById('logseq-source');
+        const defaultContent = textarea.value.trim();
+        const positionDisplay = document.getElementById('logseq-position');
+        const countDisplay = document.getElementById('logseq-count');
+        const resetButton = document.getElementById('logseq-reset');
 
-      const editor = window.CodeMirror.fromTextArea(
-        document.getElementById("editor"),
-        {
-          mode: "markdown",
-          theme: "default",
+        const editor = window.CodeMirror.fromTextArea(textarea, {
+          mode: 'markdown',
+          theme: 'default',
           lineNumbers: true,
           styleActiveLine: true,
           autoCloseBrackets: true,
           viewportMargin: Infinity,
-        }
-      );
-
-      const cursorDisplay = document.getElementById("cursor-position");
-      const characterDisplay = document.getElementById("character-count");
-
-      function updateCursor() {
-        const { line, ch } = editor.getCursor();
-        cursorDisplay.textContent = `Line ${line + 1}, Column ${ch + 1}`;
-      }
-
-      function updateCharacterCount() {
-        const count = editor.getValue().trim().length;
-        characterDisplay.textContent = `${count.toLocaleString()} character${
-          count === 1 ? "" : "s"
-        }`;
-      }
-
-      function resetContent() {
-        editor.setValue(defaultContent + "\n");
-        editor.setCursor({ line: 0, ch: 0 });
-        editor.focus();
-      }
-
-      editor.on("cursorActivity", updateCursor);
-      editor.on("change", updateCharacterCount);
-
-      document
-        .getElementById("reset-example")
-        .addEventListener("click", () => {
-          resetContent();
         });
 
-      resetContent();
-      updateCursor();
-      updateCharacterCount();
+        editor.setSize('100%', '100%');
+
+        function updateCursor() {
+          const { line, ch } = editor.getCursor();
+          positionDisplay.textContent = `Line ${line + 1}, Column ${ch + 1}`;
+        }
+
+        function updateCharacterCount() {
+          const count = editor.getValue().trim().length;
+          countDisplay.textContent = `${count.toLocaleString()} character${count === 1 ? '' : 's'}`;
+        }
+
+        function resetContent() {
+          editor.setValue(`${defaultContent}\n`);
+          editor.setCursor({ line: 0, ch: 0 });
+          editor.focus();
+          updateCursor();
+          updateCharacterCount();
+        }
+
+        editor.on('cursorActivity', updateCursor);
+        editor.on('change', updateCharacterCount);
+        resetButton.addEventListener('click', resetContent);
+
+        resetContent();
+      })();
+    </script>
+
+    <script type="module">
+      import React, { useEffect, useMemo, useState, useCallback } from 'https://esm.sh/react@18.3.1';
+      import { createRoot } from 'https://esm.sh/react-dom@18.3.1/client';
+      import { EditorContent as TiptapContent, useEditor as useTiptapEditor } from 'https://esm.sh/@tiptap/react@2.6.2?bundle';
+      import StarterKit from 'https://esm.sh/@tiptap/starter-kit@2.6.2?bundle';
+      import Underline from 'https://esm.sh/@tiptap/extension-underline@2.6.2?bundle';
+      import Link from 'https://esm.sh/@tiptap/extension-link@2.6.2?bundle';
+      import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder@2.6.2?bundle';
+      import TextAlign from 'https://esm.sh/@tiptap/extension-text-align@2.6.2?bundle';
+      import CharacterCount from 'https://esm.sh/@tiptap/extension-character-count@2.6.2?bundle';
+
+      import {
+        EditorRoot,
+        EditorContent,
+        useEditor as useNovelEditor,
+        StarterKit as NovelStarterKit,
+        TiptapLink,
+        TiptapUnderline,
+        TextStyle,
+        Color,
+        TaskList,
+        TaskItem,
+        CharacterCount as NovelCharacterCount,
+      } from 'https://esm.sh/novel@1.0.2?bundle';
+
+      const limit = 1200;
+
+      const ToolbarButton = ({ active, onClick, children }) => {
+        return (
+          React.createElement(
+            'button',
+            {
+              type: 'button',
+              className: active ? 'is-active' : '',
+              onMouseDown: (event) => {
+                event.preventDefault();
+                if (onClick) onClick();
+              },
+            },
+            children,
+          )
+        );
+      };
+
+      const TipTapPlayground = () => {
+        const editor = useTiptapEditor({
+          extensions: [
+            StarterKit.configure({
+              heading: {
+                levels: [1, 2, 3],
+              },
+            }),
+            Underline,
+            Link.configure({
+              openOnClick: false,
+              autolink: true,
+            }),
+            Placeholder.configure({
+              placeholder: 'Sketch thoughts, add lists, or build a quick outline…',
+            }),
+            TextAlign.configure({
+              types: ['heading', 'paragraph'],
+            }),
+            CharacterCount.configure({ limit }),
+          ],
+          content: `
+            <h2>TipTap Playground</h2>
+            <p>Tap anywhere and start writing. This editor is tuned for touch interactions and mobile-friendly typography.</p>
+            <ul>
+              <li>Use <strong>bold</strong>, <em>italic</em>, underline, or strike-through formatting.</li>
+              <li>Create ordered or unordered lists with the toolbar.</li>
+              <li>Align text and insert links inline.</li>
+            </ul>
+          `,
+          editorProps: {
+            attributes: {
+              class: 'tiptap-editor',
+            },
+          },
+        });
+
+        const [stats, setStats] = useState({ characters: 0, words: 0 });
+
+        useEffect(() => {
+          if (!editor) return undefined;
+          const update = () => {
+            const characterCount = editor.storage.characterCount?.characters() ?? 0;
+            const wordCount = editor.storage.characterCount?.words() ?? 0;
+            setStats({ characters: characterCount, words: wordCount });
+            const meta = document.getElementById('tiptap-meta');
+            if (meta) {
+              const remaining = Math.max(0, limit - characterCount);
+              meta.textContent = `${wordCount.toLocaleString()} words • ${characterCount.toLocaleString()} characters • ${remaining.toLocaleString()} remaining`;
+            }
+          };
+          update();
+          editor.on('update', update);
+          editor.on('selectionUpdate', update);
+          return () => {
+            editor.off('update', update);
+            editor.off('selectionUpdate', update);
+          };
+        }, [editor]);
+
+        if (!editor) {
+          return React.createElement('div', { className: 'tiptap-shell' }, 'Loading TipTap…');
+        }
+
+        return (
+          React.createElement(
+            'div',
+            { className: 'tiptap-shell' },
+            React.createElement(
+              'div',
+              { className: 'toolbar' },
+              React.createElement(ToolbarButton, {
+                active: editor.isActive('bold'),
+                onClick: () => editor.chain().focus().toggleBold().run(),
+                children: 'Bold',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive('italic'),
+                onClick: () => editor.chain().focus().toggleItalic().run(),
+                children: 'Italic',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive('underline'),
+                onClick: () => editor.chain().focus().toggleUnderline().run(),
+                children: 'Underline',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive('strike'),
+                onClick: () => editor.chain().focus().toggleStrike().run(),
+                children: 'Strike',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive('bulletList'),
+                onClick: () => editor.chain().focus().toggleBulletList().run(),
+                children: 'Bullets',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive('orderedList'),
+                onClick: () => editor.chain().focus().toggleOrderedList().run(),
+                children: 'Numbers',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive({ textAlign: 'left' }),
+                onClick: () => editor.chain().focus().setTextAlign('left').run(),
+                children: 'Left',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive({ textAlign: 'center' }),
+                onClick: () => editor.chain().focus().setTextAlign('center').run(),
+                children: 'Center',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive({ textAlign: 'right' }),
+                onClick: () => editor.chain().focus().setTextAlign('right').run(),
+                children: 'Right',
+              }),
+              React.createElement(ToolbarButton, {
+                active: editor.isActive('link'),
+                onClick: () => {
+                  const previous = editor.getAttributes('link').href;
+                  const url = window.prompt('Link URL', previous || 'https://');
+                  if (url === null) return;
+                  if (url === '') {
+                    editor.chain().focus().unsetLink().run();
+                    return;
+                  }
+                  editor.chain().focus().setLink({ href: url }).run();
+                },
+                children: 'Link',
+              }),
+            ),
+            React.createElement(TiptapContent, { editor }),
+          )
+        );
+      };
+
+      const NovelToolbar = () => {
+        const { editor } = useNovelEditor();
+        if (!editor) return null;
+        const focusChain = () => editor.chain().focus();
+        return React.createElement(
+          'div',
+          { className: 'toolbar' },
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('heading', { level: 2 }),
+            onClick: () => focusChain().toggleHeading({ level: 2 }).run(),
+            children: 'H2',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('heading', { level: 3 }),
+            onClick: () => focusChain().toggleHeading({ level: 3 }).run(),
+            children: 'H3',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('blockquote'),
+            onClick: () => focusChain().toggleBlockquote().run(),
+            children: 'Quote',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('taskList'),
+            onClick: () => focusChain().toggleTaskList().run(),
+            children: 'Tasks',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('bulletList'),
+            onClick: () => focusChain().toggleBulletList().run(),
+            children: 'Bullets',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('orderedList'),
+            onClick: () => focusChain().toggleOrderedList().run(),
+            children: 'Numbers',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('bold'),
+            onClick: () => focusChain().toggleBold().run(),
+            children: 'Bold',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('italic'),
+            onClick: () => focusChain().toggleItalic().run(),
+            children: 'Italic',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('underline'),
+            onClick: () => focusChain().toggleUnderline().run(),
+            children: 'Underline',
+          }),
+          React.createElement(ToolbarButton, {
+            active: editor.isActive('codeBlock'),
+            onClick: () => focusChain().toggleCodeBlock().run(),
+            children: 'Code',
+          }),
+        );
+      };
+
+      const novelInitial = {
+        type: 'doc',
+        content: [
+          {
+            type: 'heading',
+            attrs: { level: 2 },
+            content: [{ type: 'text', text: 'Novel Studio Playground' }],
+          },
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: 'Meet the Notion-inspired editor with collaborative-ready building blocks. Start with text, convert to tasks, or drop media effortlessly.',
+              },
+            ],
+          },
+          {
+            type: 'taskList',
+            content: [
+              {
+                type: 'taskItem',
+                attrs: { checked: false },
+                content: [
+                  { type: 'text', text: 'Type "/" to reveal the slash command palette.' },
+                ],
+              },
+              {
+                type: 'taskItem',
+                attrs: { checked: false },
+                content: [
+                  { type: 'text', text: 'Transform paragraphs into headings, lists, or callouts.' },
+                ],
+              },
+            ],
+          },
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: 'Highlight text and experiment with the floating menu to style content with precision.' },
+            ],
+          },
+        ],
+      };
+
+      const NovelPlayground = () => {
+        const [status, setStatus] = useState('Synced');
+        const [stats, setStats] = useState('0 words');
+        const statusTimer = React.useRef(null);
+
+        const extensions = useMemo(
+          () => [
+            NovelStarterKit.configure({
+              heading: {
+                levels: [1, 2, 3, 4],
+              },
+            }),
+            TiptapLink.configure({ openOnClick: false, autolink: true }),
+            TextStyle,
+            Color,
+            TiptapUnderline,
+            TaskList,
+            TaskItem.configure({ nested: true }),
+            NovelCharacterCount.configure({ limit: 20000 }),
+          ],
+          [],
+        );
+
+        const handleUpdate = useCallback(({ editor }) => {
+          const words = editor.storage?.characterCount?.words?.();
+          const wordText = words ? `${words.toLocaleString()} word${words === 1 ? '' : 's'}` : '';
+          setStats(wordText || 'Drafting…');
+          setStatus('Editing…');
+          if (statusTimer.current) {
+            window.clearTimeout(statusTimer.current);
+          }
+          statusTimer.current = window.setTimeout(() => setStatus('Synced'), 520);
+        }, []);
+
+        const handleCreate = useCallback(({ editor }) => {
+          const words = editor.storage?.characterCount?.words?.();
+          if (typeof words === 'number') {
+            setStats(`${words.toLocaleString()} word${words === 1 ? '' : 's'}`);
+          }
+        }, []);
+
+        useEffect(() => {
+          const statusDisplay = document.getElementById('novel-status');
+          if (statusDisplay) statusDisplay.textContent = status;
+        }, [status]);
+
+        useEffect(() => {
+          const statsDisplay = document.getElementById('novel-stats');
+          if (statsDisplay) statsDisplay.textContent = stats;
+        }, [stats]);
+
+        useEffect(() => () => {
+          if (statusTimer.current) {
+            window.clearTimeout(statusTimer.current);
+          }
+        }, []);
+
+        return (
+          React.createElement(
+            EditorRoot,
+            null,
+            React.createElement(
+              'div',
+              { className: 'novel-shell' },
+              React.createElement(NovelToolbar, null),
+              React.createElement(EditorContent, {
+                initialContent: novelInitial,
+                extensions,
+                className: 'novel-editor',
+                editorProps: {
+                  attributes: {
+                    class: 'novel-editor',
+                  },
+                },
+                onCreate: handleCreate,
+                onUpdate: handleUpdate,
+              }),
+            ),
+          )
+        );
+      };
+
+      const tiptapRoot = document.getElementById('tiptap-root');
+      const novelRoot = document.getElementById('novel-root');
+
+      if (tiptapRoot) {
+        createRoot(tiptapRoot).render(React.createElement(TipTapPlayground));
+      }
+
+      if (novelRoot) {
+        createRoot(novelRoot).render(React.createElement(NovelPlayground));
+      }
     </script>
   </body>
 </html>
